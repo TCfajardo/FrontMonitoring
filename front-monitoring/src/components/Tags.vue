@@ -19,15 +19,12 @@
 </template>
 
 <script>
+
 export default {
     name: 'ServerTags',
     data() {
         return {
-            servers: [
-                { id: 1, name: 'Server 1', status: 'Up' },
-                { id: 2, name: 'Server 2', status: 'Down' },
-                { id: 3, name: 'Server 3', status: 'Up' },
-            ],
+            servers: [],
         };
     },
     computed: {
@@ -41,6 +38,33 @@ export default {
             return this.servers.length;
         },
     },
+    created() {
+        // Manejar la conexión WebSocket aquí
+        const socket = new WebSocket('ws://localhost:4000');
+
+        socket.onopen = () => {
+            console.log('Conexión WebSocket establecida');
+            // Aquí puedes, por ejemplo, enviar un mensaje al servidor para iniciar la comunicación
+        };
+
+        socket.onerror = (error) => {
+            console.error('Error en la conexión WebSocket:', error);
+        };
+
+        socket.onmessage = (event) => {
+            console.log('Mensaje recibido desde el servidor:', event.data);
+            // Aquí puedes manejar los mensajes recibidos desde el servidor
+        };
+
+        // Puedes asignar el objeto WebSocket a una propiedad de datos si necesitas acceder a él en otros métodos del componente
+        this.socket = socket;
+    },
+    destroyed() {
+        // Cerrar la conexión WebSocket cuando el componente se destruye
+        if (this.socket) {
+            this.socket.close();
+        }
+    }
 };
 </script>
 
