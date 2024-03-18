@@ -19,54 +19,68 @@
 </template>
 
 <script>
-
 export default {
     name: 'ServerTags',
     data() {
         return {
             servers: [],
+            upServers: 0,
+            downServers: 0, 
         };
     },
     computed: {
-        upCount() {
-            return this.servers.filter(server => server.status === 'Up').length;
-        },
-        downCount() {
-            return this.servers.filter(server => server.status === 'Down').length;
-        },
-        totalServers() {
-            return this.servers.length;
+    upCount() {
+        return this.servers.filter(server => server.status === 'Activo').length;
+    },
+    downCount() {
+        return this.servers.filter(server => server.status === 'Inactivo').length;
+    },
+    totalServers() {
+        return this.servers.length;
+    },
+},
+
+    methods: {
+        handleMessage(event) {
+            const serverData = JSON.parse(event.data);
+            this.servers = serverData.data; 
+
+            this.upServers = 0;
+            this.downServers = 0;
+
+            // Contar servidores activos e inactivos
+            this.servers.forEach(server => {
+                if (server.status === 'Activo') {
+                    this.upServers++;
+                } else if (server.status === 'Inactivo') {
+                    this.downServers++;
+                }
+            });
         },
     },
     created() {
-        // Manejar la conexión WebSocket aquí
-        const socket = new WebSocket('ws://localhost:4000');
+        const socket = new WebSocket("ws://localhost:4000");
 
         socket.onopen = () => {
-            console.log('Conexión WebSocket establecida');
-            // Aquí puedes, por ejemplo, enviar un mensaje al servidor para iniciar la comunicación
+            console.log("Conexión WebSocket establecida");
         };
 
         socket.onerror = (error) => {
-            console.error('Error en la conexión WebSocket:', error);
+            console.error("Error en la conexión WebSocket:", error);
         };
 
-        socket.onmessage = (event) => {
-            console.log('Mensaje recibido desde el servidor:', event.data);
-            // Aquí puedes manejar los mensajes recibidos desde el servidor
-        };
+        socket.onmessage = this.handleMessage; 
 
-        // Puedes asignar el objeto WebSocket a una propiedad de datos si necesitas acceder a él en otros métodos del componente
         this.socket = socket;
     },
     destroyed() {
-        // Cerrar la conexión WebSocket cuando el componente se destruye
         if (this.socket) {
             this.socket.close();
         }
-    }
+    },
 };
 </script>
+
 
 <style scoped>
 .server-tags {

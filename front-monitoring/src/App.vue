@@ -2,17 +2,19 @@
   <div id="app">
     <h1>Servicio de monitoreo</h1>
     <ServerTags />
+    <TotalRequests/>
   </div>
 </template>
 
 <script>
 import ServerTags from './components/Tags.vue';
+import TotalRequests from './components/TotalRequests'
 
 export default {
   name: 'App',
   components: {
     ServerTags, 
-
+    TotalRequests,
   },
 };
 </script>

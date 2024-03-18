@@ -3,10 +3,8 @@ import App from './App.vue';
 
 Vue.config.productionTip = false;
 
-// Establece la conexión WebSocket
 const socket = new WebSocket('ws://localhost:4000');
 
-// Define los manejadores de eventos
 socket.onopen = () => {
     console.log('Conexión WebSocket establecida');
 };
