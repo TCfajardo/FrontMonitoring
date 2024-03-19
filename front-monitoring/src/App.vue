@@ -3,7 +3,7 @@
     <h1>Servicio de monitoreo</h1>
     <ServerTags />
     <TotalRequests/>
-    <pie-chart :labels="labels" :data="data"></pie-chart>
+    <PieChart/>
   </div>
 </template>
 
@@ -19,11 +19,7 @@ export default {
     TotalRequests,
     PieChart,
   },
-  data() {
-    return {
-      labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-      data: [12, 19, 3, 5, 2, 3],};
-  },
+  
 };
 </script>
 
