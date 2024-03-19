@@ -19,44 +19,67 @@ export default {
     name: 'TotalRequests',
     data() {
         return {
-            totalRequests: 1980,
-            errorResponses: 100,
+            totalRequests: 0,
+            errorResponses: 0,
             width: 1100,
             height: 400,
         };
     },
     created() {
-        this.setupWebSocket();
+        const socket = new WebSocket("ws://localhost:4000");
+
+        socket.onopen = () => {
+            console.log("Conexión WebSocket establecida");
+        };
+
+        socket.onerror = (error) => {
+            console.error("Error en la conexión WebSocket:", error);
+        };
+
+        socket.onmessage = this.handleMessage;
+
+        this.socket = socket;
+    },
+    destroyed() {
+        if (this.socket) {
+            this.socket.close();
+        }
     },
     methods: {
-        setupWebSocket() {
-            // Configurar WebSocket
-        },
-        updateRequests() {
-            // Actualizar datos
+        handleMessage(event) {
+            const serverData = JSON.parse(event.data);
+            console.log('serve data  ', serverData);
+            const data = serverData.data[0];
+            this.totalRequests = data.totalRequests;
+            this.errorResponses = data.errorRequests;
         },
     },
     computed: {
         errorPercentage() {
-            return this.totalRequests === 0 ? 0 : (this.errorResponses / this.totalRequests) * 100;
-        }
+            if (this.totalRequests === 0 || this.errorResponses === 0) {
+                return 0;
+            } else {
+                return (this.errorResponses / this.totalRequests) * 100;
+            }
+        },
     },
     mounted() {
-        const ctx = document.getElementById('oilChart').getContext('2d');
+    const ctx = document.getElementById('oilChart').getContext('2d');
 
-        const oilData = {
-            labels: ["Errors", "Requests"],
-            datasets: [
-                {
-                    data: [100, 1980],
-                    backgroundColor: ["red", "#ebe7e7"],
-                    borderColor: "white",
-                    borderWidth: 1
-                }
-            ]
-        };
-
-        const chartOptions = {
+    const oilData = {
+        labels: ["Errors", "Requests"],
+        datasets: [
+            {
+                data: [8, 153],
+                backgroundColor: ["red", "#ebe7e7"],
+                borderColor: "white",
+                borderWidth: 1
+            }
+        ]
+        
+    };
+    
+    const chartOptions = {
             rotation: -Math.PI,
             cutoutPercentage: 0,
             circumference: Math.PI,
@@ -80,7 +103,7 @@ export default {
             canvas.width = this.width;
             canvas.height = this.height;
             myChart.resize();
-            myChart.aspectRatio = this.width / this.height;
+
         });
     },
 };
@@ -95,14 +118,14 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 5px;
     display: flex;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
     width: 400px;
     align-items: center;
 }
 
 .request-info {
-    flex: 1; /* Hace que ocupe el espacio disponible */
-    margin-right: 20px; /* Espaciado entre los elementos */
+    flex: 1;
+    margin-right: 20px;
 }
 
 .chart-container {
