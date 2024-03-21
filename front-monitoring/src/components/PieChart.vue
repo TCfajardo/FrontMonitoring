@@ -65,7 +65,6 @@ export default {
             const serverData = JSON.parse(event.data);
             console.log('Server data:', serverData);
 
-            // Suponiendo que serverData contiene las cantidades de GET, POST y PATCH
             const { getRequests, postRequests, patchRequests } = serverData.data[0];
 
             this.updateChartData(getRequests, postRequests, patchRequests);
