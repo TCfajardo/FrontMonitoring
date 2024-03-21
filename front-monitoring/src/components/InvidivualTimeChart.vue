@@ -52,8 +52,6 @@ export default {
             server.responseTimes.forEach(time => {
                 seriesData[serverName].push(time.timeDifference);
             });
-        } else {
-            console.error("El objeto del servidor no tiene la propiedad 'responseTimes' o no es un array:", server);
         }
     });
 
@@ -86,7 +84,7 @@ export default {
     },
 
     created() {
-        const socket = new WebSocket("ws://localhost:4000");
+        const socket = new WebSocket("ws://localhost:5000");
 
         socket.onopen = () => {
             console.log("Conexión WebSocket establecida");
