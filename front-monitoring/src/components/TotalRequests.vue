@@ -1,13 +1,13 @@
 <template>
     <div class="server-requests">
         <div class="request-info">
-            <h2>Requests Overview</h2>
+            <h3>Requests Overview</h3>
             <p>Total Requests: {{ totalRequests }}</p>
             <p>Error Responses: {{ errorResponses }}</p>
-            <p>Error Percentage: {{ errorPercentage.toFixed(2) }}%</p> <!-- Aquí se utiliza toFixed(2) -->
+            <p>Error Percentage: {{ computedErrorPercentage.toFixed(2) }}%</p>
         </div>
         <div class="chart-container">
-            <canvas id="oilChart" :style="{ width: width + 'px' }"></canvas>
+            <canvas id="doughnutChart" :width="width" :height="height"></canvas>
         </div>
     </div>
 </template>
@@ -21,9 +21,18 @@ export default {
         return {
             totalRequests: 0,
             errorResponses: 0,
-            width: 1100,
-            height: 400,
+            width: 400,
+            height: 200,
         };
+    },
+    computed: {
+        computedErrorPercentage() {
+            if (this.totalRequests === 0 || this.errorResponses === 0) {
+                return 0;
+            } else {
+                return (this.errorResponses / this.totalRequests) * 100;
+            }
+        },
     },
     created() {
         const socket = new WebSocket("ws://localhost:5000");
@@ -36,7 +45,9 @@ export default {
             console.error("Error en la conexión WebSocket:", error);
         };
 
-        socket.onmessage = this.handleMessage;
+        socket.onmessage = (event) => {
+            this.handleMessage(event);
+        };
 
         this.socket = socket;
     },
@@ -48,64 +59,55 @@ export default {
     methods: {
         handleMessage(event) {
             const serverData = JSON.parse(event.data);
-            console.log('serve data  ', serverData);
             const data = serverData.data[0];
             this.totalRequests = data.totalRequests;
             this.errorResponses = data.errorRequests;
+            this.updateChart();
         },
-    },
-    computed: {
-        errorPercentage() {
-            if (this.totalRequests === 0 || this.errorResponses === 0) {
-                return 0;
+        updateChart() {
+            const doughnutData = {
+                labels: ["Error Responses", "Successful Responses"],
+                datasets: [
+                    {
+                        data: [this.errorResponses, this.totalRequests - this.errorResponses],
+                        backgroundColor: ["red", "#ebe7e7"],
+                        borderColor: "white",
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            // Verificar si el gráfico ya está creado
+            if (this.chartInstance) {
+                // Desactivar la animación
+                this.chartInstance.options.animation = false;
+
+                // Actualizar los datos del gráfico existente
+                this.chartInstance.data.datasets.forEach((dataset, index) => {
+                    dataset.data = doughnutData.datasets[index].data;
+                });
+                this.chartInstance.update();
             } else {
-                return (this.errorResponses / this.totalRequests) * 100;
+                const canvas = document.getElementById('doughnutChart');
+                const ctx = canvas.getContext('2d');
+
+                const chartOptions = {
+                    cutoutPercentage: 50, // 50% para que se vea como un donut
+                    animation: {
+                        animateRotate: false,
+                        animateScale: false // Desactivar la animación al crear el gráfico
+                    }
+                };
+
+                // Crear un nuevo gráfico si no existe
+                this.chartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: doughnutData,
+                    options: chartOptions
+                });
             }
-        },
-    },
-    mounted() {
-    const ctx = document.getElementById('oilChart').getContext('2d');
-
-    const oilData = {
-        labels: ["Errors", "Requests"],
-        datasets: [
-            {
-                data: [8, 153],
-                backgroundColor: ["red", "#ebe7e7"],
-                borderColor: "white",
-                borderWidth: 1
-            }
-        ]
-        
-    };
-    
-    const chartOptions = {
-            rotation: -Math.PI,
-            cutoutPercentage: 0,
-            circumference: Math.PI,
-            legend: {
-                position: 'left'
-            },
-            animation: {
-                animateRotate: false,
-                animateScale: true
-            }
-        };
-
-        const myChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: oilData,
-            options: chartOptions
-        });
-
-        this.$nextTick(() => {
-            const canvas = document.getElementById('oilChart');
-            canvas.width = this.width;
-            canvas.height = this.height;
-            myChart.resize();
-
-        });
-    },
+        }
+    }
 };
 </script>
 
@@ -130,11 +132,5 @@ export default {
 
 .chart-container {
     height: 200px;
-}
-
-canvas {
-    width: 100%;
-    height: 100%;
-    padding: 1%;
 }
 </style>

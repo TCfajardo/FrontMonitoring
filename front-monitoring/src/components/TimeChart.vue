@@ -20,6 +20,11 @@ export default {
                 title: {
                     text: 'System Response Times'
                 },
+                xAxis: {
+                    title: {
+                        text: 'Time'
+                    }
+                },
                 yAxis: {
                     title: {
                         text: 'Resp. Times (ms)'
@@ -27,7 +32,9 @@ export default {
                 },
                 series: [{
                     name: 'System Response Times',
-                    data: []
+                    data: [],
+                    color: 'rgba(255, 165, 0, 0.8)',
+                    lineWidth: 1.5
                 }]
             });
         });
@@ -49,6 +56,46 @@ export default {
             });
 
             chartInstance.series[0].setData(responseTimes);
+
+            const totalResponseTimes = responseTimes.reduce((acc, curr) => acc + curr, 0);
+            const averageResponseTime = totalResponseTimes / responseTimes.length;
+
+            if (chartInstance.averageLine) {
+                chartInstance.averageLine.destroy();
+            }
+            chartInstance.averageLine = chartInstance.renderer
+                .path(['M', chartInstance.xAxis[0].toPixels(chartInstance.xAxis[0].min), chartInstance.yAxis[0].toPixels(averageResponseTime), 'L', chartInstance.xAxis[0].toPixels(chartInstance.xAxis[0].max), chartInstance.yAxis[0].toPixels(averageResponseTime)])
+                .attr({
+                    'stroke-width': 1,
+                    stroke: 'green',
+                    zIndex: 8
+                })
+                .add();
+
+            if (chartInstance.averageLabel) {
+                chartInstance.averageLabel.destroy();
+            }
+            chartInstance.averageLabel = chartInstance.renderer.label(
+                'Average: ' + averageResponseTime.toFixed(2),
+                chartInstance.plotLeft + chartInstance.plotWidth / 2,
+                chartInstance.yAxis[0].toPixels(averageResponseTime) - 15,
+                'rect',
+                null,
+                null,
+                true
+            )
+            .css({
+                color: 'black',
+                fontSize: '11px'
+            })
+            .attr({
+                zIndex: 5,
+                padding: 2,
+                
+                'stroke-width': 1,
+                'text-anchor': 'middle'
+            })
+            .add();
         };
 
         return { chartContainer, handleMessage };
@@ -82,7 +129,6 @@ export default {
 .time-chart {
     width: 100%;
     height: 350px;
-    background-color: rgb(215, 246, 236);
     width: 70%;
 }
 </style>

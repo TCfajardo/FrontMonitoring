@@ -1,5 +1,11 @@
 <template>
     <div class="request-count-pie-chart-container">
+        <div class="request-info">
+            <h3>HTTP Methods</h3>
+            <p>GET {{ getRequests }}</p>
+            <p>POST {{ postRequests }}</p>
+            <p>PATCH {{ patchRequests }}</p>
+        </div>
         <canvas ref="requestCountPieChart"></canvas>
     </div>
 </template>
@@ -11,6 +17,9 @@ export default {
     name: 'PieChart',
     data() {
         return {
+            getRequests: 0,
+            postRequests: 0,
+            patchRequests: 0,
             chartData: {
                 labels: ['GET', 'POST', 'PATCH'],
                 datasets: [
@@ -38,10 +47,12 @@ export default {
                     },
                 },
             },
+            chartInstance: null,
         };
     },
+
     created() {
-        const socket = new WebSocket("ws://localhost:4000");
+        const socket = new WebSocket("ws://localhost:5000");
 
         socket.onopen = () => {
             console.log("Conexión WebSocket establecida");
@@ -67,27 +78,29 @@ export default {
 
             const { getRequests, postRequests, patchRequests } = serverData.data[0];
 
-            this.updateChartData(getRequests, postRequests, patchRequests);
+            if (
+                getRequests !== this.chartData.datasets[0].data[0] ||
+                postRequests !== this.chartData.datasets[0].data[1] ||
+                patchRequests !== this.chartData.datasets[0].data[2]
+            ) {
+                this.getRequests = getRequests;
+                this.postRequests = postRequests;
+                this.patchRequests = patchRequests;
+                this.updateChartData(getRequests, postRequests, patchRequests);
+            }
         },
+
         updateChartData(getCount, postCount, patchCount) {
-            this.chartData.datasets[0].data = [getCount, postCount, patchCount];
+            this.chartInstance.data.datasets[0].data = [getCount, postCount, patchCount];
+            this.chartInstance.update();
         },
     },
     mounted() {
-        const chartInstance = new Chart(this.$refs.requestCountPieChart, {
+        this.chartInstance = new Chart(this.$refs.requestCountPieChart, {
             type: 'pie',
             data: this.chartData,
             options: this.chartOptions,
         });
-
-        this.$watch(
-            () => this.chartData,
-            (newData) => {
-                chartInstance.data = newData;
-                chartInstance.update();
-            },
-            { deep: true }
-        );
     },
 };
 </script>
@@ -104,5 +117,10 @@ export default {
     flex-wrap: wrap;
     width: 400px;
     align-items: center;
+}
+
+.request-info {
+    flex: 1;
+    margin-right: 20px;
 }
 </style>
