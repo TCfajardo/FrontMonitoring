@@ -5,12 +5,20 @@
             <p>
                 <img src="../assets/flechaup.png" alt="Up Arrow" />
             </p>
+            <ul v-if="activeServers.length > 0" class="server-list">
+                <li v-for="server in activeServers" :key="server.server">{{ server.server }}</li>
+            </ul>
+            <p v-else>No up servers</p>
         </div>
         <div class="server-down">
             <h4>Servers Down: {{ downCount }}</h4>
             <p>
                 <img src="../assets/flechadown.png" alt="Down Arrow" />
             </p>
+            <ul v-if="inactiveServers.length > 0" class="server-list">
+                <li v-for="server in inactiveServers" :key="server.server">{{ server.server }}</li>
+            </ul>
+            <p v-else>No down servers</p>
         </div>
         <div class="total-servers">
             <p>Total Servers: {{ totalServers }}</p>
@@ -25,37 +33,39 @@ export default {
         return {
             servers: [],
             upServers: 0,
-            downServers: 0, 
+            downServers: 0,
         };
     },
     computed: {
-    upCount() {
-        return this.servers.filter(server => server.status === 'Activo').length;
+        upCount() {
+            return this.servers.filter(server => server.status === 'Activo').length;
+        },
+        downCount() {
+            return this.servers.filter(server => server.status === 'Inactivo').length;
+        },
+        totalServers() {
+            return this.servers.length;
+        },
+        activeServers() {
+            return this.servers.filter(server => server.status === 'Activo');
+        },
+        inactiveServers() {
+            return this.servers.filter(server => server.status === 'Inactivo');
+        },
     },
-    downCount() {
-        return this.servers.filter(server => server.status === 'Inactivo').length;
-    },
-    totalServers() {
-        return this.servers.length;
-    },
-},
-
     methods: {
         handleMessage(event) {
             const serverData = JSON.parse(event.data);
-            this.servers = serverData.data; 
-
-            this.upServers = 0;
-            this.downServers = 0;
-
-            // Contar servidores activos e inactivos
-            this.servers.forEach(server => {
-                if (server.status === 'Activo') {
-                    this.upServers++;
-                } else if (server.status === 'Inactivo') {
-                    this.downServers++;
-                }
-            });
+            if (Array.isArray(serverData.data)) {
+                this.servers = serverData.data;
+                this.countServers();
+            } else {
+                console.error("Los datos del servidor no son un array:", serverData.data);
+            }
+        },
+        countServers() {
+            this.upServers = this.servers.filter(server => server.status === 'Activo').length;
+            this.downServers = this.servers.filter(server => server.status === 'Inactivo').length;
         },
     },
     created() {
@@ -69,7 +79,7 @@ export default {
             console.error("Error en la conexión WebSocket:", error);
         };
 
-        socket.onmessage = this.handleMessage; 
+        socket.onmessage = this.handleMessage;
 
         this.socket = socket;
     },
@@ -81,16 +91,13 @@ export default {
 };
 </script>
 
-
 <style scoped>
 .server-tags {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
     width: 100%;
     max-width: 700px;
-    height: 120px;
     margin: 0 auto;
     padding: 5px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -106,18 +113,13 @@ export default {
     text-align: center;
 }
 
-.server-up h2,
-.server-down h2,
-.total-servers h2 {
-    font-size: 24px;
-    font-weight: bold;
-    margin-bottom: 10px;
+.server-list {
+    list-style-type: none;
+    padding: 0;
 }
 
-.server-up p,
-.server-down p {
-    font-size: 16px;
-    margin-bottom: 0;
+.server-list li {
+    margin: 5px 0;
 }
 
 .server-up img,
@@ -125,5 +127,4 @@ export default {
     width: 50px;
     height: 50px;
 }
-
 </style>
