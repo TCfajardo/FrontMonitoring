@@ -12,6 +12,7 @@
 
 <script>
 import Chart from 'chart.js/auto';
+import config from '../../config.js';
 
 export default {
     name: 'PieChart',
@@ -52,7 +53,7 @@ export default {
     },
 
     created() {
-        const socket = new WebSocket("ws://localhost:5000");
+        const socket = new WebSocket(config.baseURL);
 
         socket.onopen = () => {
             console.log("Conexión WebSocket establecida");

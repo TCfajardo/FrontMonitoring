@@ -1,9 +1,10 @@
 import Vue from 'vue';
 import App from './App.vue';
+import config from '../config';
 
 Vue.config.productionTip = false;
 
-const socket = new WebSocket('ws://localhost:5000');
+const socket = new WebSocket(config.baseURL);
 
 socket.onopen = () => {
     console.log('Conexión WebSocket establecida');

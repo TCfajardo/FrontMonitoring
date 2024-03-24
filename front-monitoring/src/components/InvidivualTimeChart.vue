@@ -5,6 +5,7 @@
 <script>
 import { ref, onMounted } from 'vue';
 import Highcharts from 'highcharts';
+import config from '../../config.js';
 
 export default {
     name: 'IndividualTimeChart',
@@ -84,7 +85,7 @@ export default {
     },
 
     created() {
-        const socket = new WebSocket("ws://localhost:5000");
+        const socket = new WebSocket(config.baseURL);
 
         socket.onopen = () => {
             console.log("Conexión WebSocket establecida");
