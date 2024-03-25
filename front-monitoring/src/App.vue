@@ -8,6 +8,9 @@
     </div>
     <div class="centered">
       <TimeChart/>
+    </div>
+    <div class="grafics-servers">
+      <h3>Servers Response Time</h3>
       <IndividualTimeChart/>
     </div>
     <footer class="footer">
@@ -43,6 +46,7 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  justify-content: center;
 }
 
 .footer {
@@ -67,4 +71,10 @@ export default {
   flex-wrap: wrap;
   
 }
+
+.grafics-servers {
+  width: 80%;
+  margin: 2% auto;
+}
+
 </style>

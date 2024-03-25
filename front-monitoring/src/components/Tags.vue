@@ -130,4 +130,12 @@ export default {
     width: 50px;
     height: 50px;
 }
+
+p{
+    font-size: 13px;
+}
+
+li{
+    font-size: 13px;
+}
 </style>

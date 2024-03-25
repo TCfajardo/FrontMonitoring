@@ -134,4 +134,7 @@ export default {
 .chart-container {
     height: 200px;
 }
+p{
+    font-size: 13px;
+}
 </style>

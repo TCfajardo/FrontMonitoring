@@ -120,6 +120,10 @@ export default {
     align-items: center;
 }
 
+p{
+    font-size: 13px;
+}
+
 .request-info {
     flex: 1;
     margin-right: 20px;
