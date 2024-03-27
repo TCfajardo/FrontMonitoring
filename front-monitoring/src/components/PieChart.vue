@@ -84,7 +84,7 @@ export default {
                 postRequests !== this.chartData.datasets[0].data[1] ||
                 patchRequests !== this.chartData.datasets[0].data[2]
             ) {
-                this.getRequests = getRequests;
+                this.getRequests = getRequests  ;
                 this.postRequests = postRequests;
                 this.patchRequests = patchRequests;
                 this.updateChartData(getRequests, postRequests, patchRequests);

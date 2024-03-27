@@ -34,7 +34,7 @@ export default {
                 series: [{
                     name: 'System Response Times',
                     data: [],
-                    color: 'rgba(255, 165, 0, 0.8)',
+                    color: 'rgba(205, 155, 228)',
                     lineWidth: 1.5
                 }]
             });

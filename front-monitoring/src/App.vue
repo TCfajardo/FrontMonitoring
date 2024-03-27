@@ -8,23 +8,24 @@
     </div>
     <div class="centered">
       <TimeChart/>
+      <LinesChart/>
+      <TableServers/>
     </div>
-    <div class="grafics-servers">
-      <h3>Servers Response Time</h3>
-      <IndividualTimeChart/>
-    </div>
+  
     <footer class="footer">
-        <p>&copy; 2024 Monitoreo de Parqueadero NN. Todos los derechos reservados.</p>
+      <p>&copy; 2024 Monitoreo de Parqueadero NN. Todos los derechos reservados.</p>
     </footer>
   </div>
 </template>
+
 
 <script>
 import ServerTags from './components/Tags.vue';
 import TotalRequests from './components/TotalRequests'
 import PieChart from './components/PieChart.vue';
 import TimeChart from './components/TimeChart.vue'
-import IndividualTimeChart from './components/InvidivualTimeChart.vue'
+import LinesChart from './components/LinesChart.vue'
+import TableServers from './components/TableServers.vue'
 
 export default {
   name: 'App',
@@ -33,8 +34,10 @@ export default {
     TotalRequests,
     PieChart,
     TimeChart,
-    IndividualTimeChart,
-  },
+    TableServers,
+    LinesChart,
+
+  }
 };
 </script>
 
@@ -69,12 +72,6 @@ export default {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  
-}
-
-.grafics-servers {
-  width: 80%;
-  margin: 2% auto;
 }
 
 </style>
